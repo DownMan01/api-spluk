@@ -1,0 +1,220 @@
+openapi: 3.0.3
+info:
+  title: Spluk API
+  description: Public API for Spluk.app - the anonymous messaging platform. Send messages to user links, fetch public profiles, stats, and world chat.
+  version: 1.0.0
+  contact:
+    name: Spluk Support
+    url: https://spluk.app
+servers:
+  - url: https://api.spluk.app
+    description: Production server
+
+paths:
+  /:
+    get:
+      summary: API Root
+      description: Welcome message and API info.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Welcome'
+              example:
+                message: "Welcome to spluk.app API"
+                version: "1.0.0"
+                environment: "production"
+                serverTime: "2025-12-29T11:47:41.852Z"
+
+  /v1/messages/{username}:
+    post:
+      summary: Send anonymous message
+      description: Send a message to a user's profile link. The message passes through server-side filters (hidden words, blocks, rate limits).
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The recipient's username (case-insensitive)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  description: Message content (required)
+                sender_name:
+                  type: string
+                  description: Optional sender name (defaults to "Anonymous" or similar)
+                is_hidden:
+                  type: boolean
+                  default: false
+                  description: If true, message is hidden by default (admin only?)
+              required:
+                - content
+      responses:
+        '200':
+          description: Message sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Bad request (missing content, etc.)
+        '403':
+          description: Link paused
+        '404':
+          description: User not found
+        '500':
+          description: Server error
+
+  /v1/profiles/{username}:
+    get:
+      summary: Get public profile
+      description: Fetch public information about a user's profile.
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Profile found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  profile:
+                    type: object
+                    properties:
+                      username:
+                        type: string
+                      display_name:
+                        type: string
+                      bio:
+                        type: string
+                      avatar_url:
+                        type: string
+                      theme_color:
+                        type: string
+        '404':
+          description: Profile not found
+
+  /v1/stats/{username}:
+    get:
+      summary: Get message stats
+      description: Public message statistics for a profile (total, today, this week, growth).
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Stats retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  stats:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                      today:
+                        type: integer
+                      thisWeek:
+                        type: integer
+                      weeklyGrowth:
+                        type: integer
+        '404':
+          description: User not found
+
+  /v1/world:
+    get:
+      summary: Get world chat messages
+      description: Fetch latest world chat messages (public global chat).
+      parameters:
+        - name: before
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Timestamp to fetch older messages (pagination)
+      responses:
+        '200':
+          description: Messages retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messages:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        content:
+                          type: string
+                        sender_name:
+                          type: string
+                        created_at:
+                          type: string
+                          format: date-time
+                        # reactions, etc.
+
+  /v1/username-available:
+    get:
+      summary: Check username availability
+      parameters:
+        - name: username
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Availability check
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  available:
+                    type: boolean
+
+components:
+  schemas:
+    Welcome:
+      type: object
+      properties:
+        message:
+          type: string
+        version:
+          type: string
+        environment:
+          type: string
+        serverTime:
+          type: string
+          format: date-time
