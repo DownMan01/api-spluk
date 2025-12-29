@@ -1,7 +1,6 @@
 // app/api/v1/stats/[username]/route.ts
+import { getSupabaseServer } from "@/lib/supabase/server";
 
-
-import { supabaseServer } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 function calculateStats(messages: any[]) {
@@ -38,8 +37,9 @@ export async function GET(
   { params }: { params: Promise<{ username: string }> }
 ) {
   const { username } = await params;
+  const supabase = getSupabaseServer();
 
-  const { data: profile } = await supabaseServer
+  const { data: profile } = await supabase
     .from("profiles")
     .select("id")
     .eq("username", username.toLowerCase())
@@ -47,7 +47,7 @@ export async function GET(
 
   if (!profile) return Response.json({ error: "User not found" }, { status: 404 });
 
-  const { data: messages } = await supabaseServer
+  const { data: messages } = await supabase
     .from("messages")
     .select("created_at")
     .eq("recipient_id", profile.id);

@@ -1,7 +1,6 @@
 // app/api/v1/profiles/[username]/route.ts
+import { getSupabaseServer } from "@/lib/supabase/server";
 
-
-import { supabaseServer } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export async function GET(
@@ -9,8 +8,9 @@ export async function GET(
   { params }: { params: Promise<{ username: string }> }
 ) {
   const { username } = await params;
+  const supabase = getSupabaseServer();
 
-  const { data, error } = await supabaseServer
+  const { data, error } = await supabase
     .from("profiles")
     .select("username, display_name, bio, avatar_url, theme_color")
     .eq("username", username.toLowerCase())
