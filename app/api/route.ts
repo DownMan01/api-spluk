@@ -1,3 +1,4 @@
+// app/api/route.ts
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -6,6 +7,6 @@ export async function GET() {
     version: "1.0.0",
     environment: process.env.NODE_ENV === "development" ? "development" : "production",
     serverTime: new Date().toISOString(),
-    docs: "https://api.spluk.app/v1", 
+    docs: "https://api.spluk.app/docs",
   });
 }

@@ -1,16 +1,16 @@
+// app/api/v1/messages/[username]/route.ts
 import { supabaseServer } from "@/lib/supabase/server";
-import { NextRequest } from "next/server";
 
 export async function POST(
-  req: NextRequest,
-  { params }: { params: { username: string } }
+  req: Request,
+  { params }: { params: Promise<{ username: string }> }
 ) {
-  const { username } = params;
+  const { username } = await params;
   const body = await req.json();
   const { content, sender_name, is_hidden = false } = body;
 
   if (!content?.trim()) {
-    return Response.json({ error: "Message content is required" }, { status: 400 });
+    return Response.json({ error: "Content is required" }, { status: 400 });
   }
 
   const { data: profile } = await supabaseServer
@@ -22,18 +22,16 @@ export async function POST(
   if (!profile) return Response.json({ error: "User not found" }, { status: 404 });
   if (profile.is_link_paused) return Response.json({ error: "This link is paused" }, { status: 403 });
 
-  const { data, error } = await supabaseServer.functions.invoke("send-message", {
+  const { error } = await supabaseServer.functions.invoke("send-message", {
     body: {
       recipient_id: profile.id,
       content: content.trim(),
-      sender_name: sender_name || undefined,
+      sender_name,
       is_hidden,
     },
   });
 
-  if (error || data?.error) {
-    return Response.json({ error: "Failed to send message" }, { status: 500 });
-  }
+  if (error) return Response.json({ error: "Failed to send message" }, { status: 500 });
 
-  return Response.json({ success: true, message: "Sent!" });
+  return Response.json({ success: true });
 }

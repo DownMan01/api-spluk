@@ -1,10 +1,11 @@
+// app/api/v1/profiles/[username]/route.ts
 import { supabaseServer } from "@/lib/supabase/server";
 
 export async function GET(
   _req: Request,
-  { params }: { params: { username: string } }
+  { params }: { params: Promise<{ username: string }> }
 ) {
-  const { username } = params;
+  const { username } = await params;
 
   const { data, error } = await supabaseServer
     .from("profiles")

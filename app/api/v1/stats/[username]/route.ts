@@ -1,4 +1,4 @@
-// app/api/v1/stats/[@username]/route.ts
+// app/api/v1/stats/[username]/route.ts
 import { supabaseServer } from "@/lib/supabase/server";
 
 function calculateStats(messages: any[]) {
@@ -9,25 +9,32 @@ function calculateStats(messages: any[]) {
   const lastWeekStart = new Date(weekStart);
   lastWeekStart.setDate(lastWeekStart.getDate() - 7);
 
-  let todayCount = 0, thisWeek = 0, lastWeek = 0;
+  let todayCount = 0, thisWeek = 0, lastWeekCount = 0;
 
-  messages.forEach((m) => {
+  messages.forEach((m: any) => {
     const date = new Date(m.created_at);
     if (date >= today) todayCount++;
     if (date >= weekStart) thisWeek++;
-    if (date >= lastWeekStart && date < weekStart) lastWeek++;
+    if (date >= lastWeekStart && date < weekStart) lastWeekCount++;
   });
 
-  const growth = lastWeek > 0 ? Math.round(((thisWeek - lastWeek) / lastWeek) * 100) : thisWeek > 0 ? 100 : 0;
+  const growth = lastWeekCount > 0
+    ? Math.round(((thisWeek - lastWeekCount) / lastWeekCount) * 100)
+    : thisWeek > 0 ? 100 : 0;
 
-  return { total: messages.length, today: todayCount, thisWeek, weeklyGrowth: growth };
+  return {
+    total: messages.length,
+    today: todayCount,
+    thisWeek,
+    weeklyGrowth: growth,
+  };
 }
 
 export async function GET(
   _req: Request,
-  { params }: { params: { username: string } }
+  { params }: { params: Promise<{ username: string }> }
 ) {
-  const { username } = params;
+  const { username } = await params;
 
   const { data: profile } = await supabaseServer
     .from("profiles")

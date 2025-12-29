@@ -1,14 +1,14 @@
-
+// app/docs/page.tsx
 import { RedocStandalone } from 'redoc';
 
 export default function ApiDocs() {
   return (
     <RedocStandalone
-      specUrl="https://api.spluk.app/openapi.yaml"
+      specUrl="/openapi.yaml"
       options={{
-        theme: { colors: { primary: { main: '#2563eb' } } },
+        theme: { colors: { primary: { main: '#8b5cf6' } } },
         hideDownloadButton: false,
-        expandResponses: '200,201',
+        expandResponses: "200,201",
       }}
     />
   );
