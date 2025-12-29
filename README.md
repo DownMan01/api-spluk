@@ -3,7 +3,7 @@
 Public REST API for [spluk.app](https://spluk.app) — anonymous messaging platform.
 
 ## Base URL
-`https://api.spluk.app`
+`https://api.spluk.app.`
 
 ## Documentation
 - Interactive: https://api.spluk.app/openapi.yaml (view with Redoc/Swagger)
