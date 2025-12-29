@@ -1,4 +1,6 @@
 // app/api/v1/profiles/[username]/route.ts
+export const dynamic = "force-dynamic";
+
 import { supabaseServer } from "@/lib/supabase/server";
 
 export async function GET(

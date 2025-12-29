@@ -1,4 +1,6 @@
 // app/api/v1/world/route.ts
+export const dynamic = "force-dynamic";
+
 import { supabaseServer } from "@/lib/supabase/server";
 
 export async function GET(req: Request) {

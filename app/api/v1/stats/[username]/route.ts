@@ -1,4 +1,6 @@
 // app/api/v1/stats/[username]/route.ts
+export const dynamic = "force-dynamic";
+
 import { supabaseServer } from "@/lib/supabase/server";
 
 function calculateStats(messages: any[]) {
