@@ -1,7 +1,7 @@
 // app/api/v1/messages/[username]/route.ts
-export const dynamic = "force-dynamic";
 
 import { supabaseServer } from "@/lib/supabase/server";
+export const dynamic = "force-dynamic";
 
 export async function POST(
   req: Request,
